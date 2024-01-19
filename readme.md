@@ -1,3 +1,5 @@
+Notes for me:
+
 so till 9:50, 
 
 to get that in terminal, we use app.go, user_controller.go and main.go of MVC folder,app.goLet's break down the code in each file and then discuss how they work together:
