@@ -675,10 +675,6 @@ This code follows the MVC (Model-View-Controller) pattern where the controller (
 
 
 
-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
-
-
-
 Section 4:
 
 short explanation before putting every thing together video
