@@ -601,15 +601,103 @@ In summary, errors.utils.go defines a reusable struct for representing applicati
 
 This structure follows the Model-View-Controller (MVC) pattern, where domain represents the data model, services handle business logic, and controllers manage the HTTP request/response flow. The app package orchestrates the application's startup and HTTP server.
 
+section 4: http framework
+
+gin
+
+users_controllers.go
+
+package controllers
+
+import (
+	"net/http"
+	"strconv" // string conversion
+
+	"github.com/ShreyanshKeshav33/Golang-Microservices/mvc/services"
+	"github.com/ShreyanshKeshav33/Golang-Microservices/mvc/utils"
+	"github.com/gin-gonic/gin"
+)
+
+// GetUser is a handler function for getting user information.
+func GetUser(c *gin.Context) {
+	c: It represents the Gin context (gin.Context) for the current HTTP request. 
+	// Extract user_id parameter from the request URL and convert it to int64
+	userId, err := strconv.ParseInt(c.Param("user_id"), 10, 64)
+	// log.Printf("About to process user_id %v", userId)
+
+	// Check if there was an error in parsing the user_id
+	if err != nil {
+		// If there was an error, create an ApplicationError and respond with it
+		apiErr := &utils.ApplicationError{
+			Message:    "user_id must be a number",
+			StatusCode: http.StatusBadRequest,
+			Code:       "bad request",
+		}
+		c.JSON(apiErr.StatusCode, apiErr)
+		//apiErr.StatusCode: It specifies the HTTP status code to be included in the response. The StatusCode field is part of the utils.ApplicationError struct (assuming apiErr is an instance of this struct).
+
+		return
+	}
+
+	// Call the GetUser function from the services package to retrieve user information
+	user, apiErr := services.GetUser(userId)
+	if apiErr != nil {
+		// If there was an error in the service layer, respond with the error
+		c.JSON(apiErr.StatusCode, apiErr)
+		// Handle the error and return to the client
+		return
+	}
+
+	// If everything is successful, respond with the user information
+	c.JSON(http.StatusOK, user)
+}
+Explanation and comments:
+
+The GetUser function is a handler function for processing requests to retrieve user information.
+
+It uses the Gin web framework (imported as github.com/gin-gonic/gin) to handle HTTP requests and responses.
+
+It extracts the user_id parameter from the request URL using c.Param("user_id") and converts it to an int64 using strconv.ParseInt.
+
+If there is an error in parsing the user_id, it creates an ApplicationError and responds with a JSON containing the error details.
+
+If parsing is successful, it calls the services.GetUser function to retrieve user information based on the provided user_id.
+
+If there is an error in the service layer, it responds with a JSON containing the error details.
+
+If the user information retrieval is successful, it responds with a JSON containing the user details and a status code of http.StatusOK.
+
+Logging statements (commented out in this code) can be uncommented and used for debugging or logging purposes.
+
+This code follows the MVC (Model-View-Controller) pattern where the controller (GetUser function) handles the HTTP request, interacts with the service layer (services.GetUser), and sends back an appropriate response to the client. Error handling is done by creating and returning ApplicationError instances with relevant details.
 
 
 
+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
 
 
 
+Section 4:
+
+short explanation before putting every thing together video
+
+Purpose:
+The overall purpose is to provide a clean and modular structure for interacting with the GitHub API. The github_provider.go file encapsulates the logic for creating a new repository, including error handling, making it easier to maintain and test. The restclient package provides a reusable function for making HTTP requests.
 
 
+Explanation:
+resclient.go: This file provides a utility function Post for making HTTP POST requests using the http package. It handles the marshaling of the request body to JSON.
 
+github_error.go: Defines structures (GithubErrorResponse and GithubError) representing the error response from the GitHub API.
+
+github_provider.go: This file implements a function CreateRepo that interacts with the GitHub API to create a new repository. It uses the Post function from restclient.go to make HTTP requests. The function handles authentication, sends the request, and processes the response. If successful, it unmarshals the response into a CreateResponse struct.
+
+
+Interaction:
+
+github_provider.go imports restclient for making HTTP requests and github for error and response structures.
+The CreateRepo function uses restclient.Post to send a POST request to GitHub API for repository creation.
+The response is processed based on status code. If unsuccessful, an error response is returned. If successful, the response body is unmarshaled into a CreateResponse.
 
 
 
